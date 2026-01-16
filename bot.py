@@ -19,16 +19,23 @@ async def main():
         webhook_requests_handler.register(app, path="/webhook")
         setup_application(app, dp, bot=bot)
 
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, '0.0.0.0', 10000)
+        await site.start()
+
         await bot.delete_webhook(drop_pending_updates=True)
         await bot.set_webhook(url=WEBHOOK)
 
         print("Бот запущен!")
-        web.run_app(app, host="0.0.0.0", port=10000)
+        await asyncio.Event().wait()
+        await runner.cleanup()
     else:
         bot = Bot(token=TOKEN)
         dp = Dispatcher()
         dp.message.middleware(CommandMiddleware())
         dp.include_routers(main_commands.router, set_profile.router)
+        print("Бот запущен!")
         await dp.start_polling(bot)
 
 
