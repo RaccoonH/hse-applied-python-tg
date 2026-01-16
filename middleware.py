@@ -6,6 +6,8 @@ from data.user_data import find_user, update_user_daily_info
 
 class CommandMiddleware(BaseMiddleware):
     async def __call__(self, handler, event: Message, data: dict):
+        print(f"Получено сообщение: {event.text}")
+
         avaliable_cmds = ["/start", "/set_profile", "/help", "/help_workout"]
         if event.text in avaliable_cmds:
             return await handler(event, data)
